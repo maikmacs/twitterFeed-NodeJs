@@ -1,8 +1,10 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 
 require('dotenv').config();
 
+app.use(cors());
 app.set('port', process.env.PORT || 3001);
 
 var Twit = require('twit');

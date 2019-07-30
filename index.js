@@ -19,19 +19,20 @@ var T = new Twit({
 app.get('/api/tweets', function(req, res) {
   const param = req.query.q;
   const max_id = req.query.max_id;
+  const type = req.query.type;
 
   if (!param && !max_id) {
     res.json({
       error: 'Missing required parameter `q` and `max_id`',
     });
   } else if (!max_id) {
-    searchTweets(param, res);
+    searchTweets(param, type, res);
   } else {
     fetchMoreTweets(param, max_id, res);
   }
 });
 
-function searchTweets(param, res) {
+function searchTweets(param, type, res) {
   T.get(
     'search/tweets',
     {
@@ -45,6 +46,7 @@ function searchTweets(param, res) {
           id: tweet.id,
           text: tweet.text,
           date: tweet.created_at,
+          type: type,
         }));
 
       res.json(response);
@@ -57,7 +59,15 @@ function fetchMoreTweets(param, max_id, res) {
     'search/tweets',
     { q: param, max_id: max_id, include_entities: 1, count: 20 },
     function(err, reply) {
-      res.json(reply);
+      let response = reply.statuses
+        //.filter(tweet => tweet.in_reply_to_status_id === null)
+        .map(tweet => ({
+          id: tweet.id,
+          text: tweet.text,
+          date: tweet.created_at,
+        }));
+
+      res.json(response);
     },
   );
 }

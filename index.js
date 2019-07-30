@@ -34,10 +34,13 @@ app.get('/api/tweets', function(req, res) {
 function searchTweets(param, res) {
   T.get(
     'search/tweets',
-    { q: '#' + param, count: 30, result_type: 'recent' },
+    {
+      q: '#' + param + '-filter:retweets -filter:replies',
+      count: 30,
+    },
     function(err, reply) {
       let response = reply.statuses
-        .filter(tweet => tweet.in_reply_to_status_id === null)
+        //.filter(tweet => tweet.in_reply_to_status_id === null)
         .map(tweet => ({
           id: tweet.id,
           text: tweet.text,
